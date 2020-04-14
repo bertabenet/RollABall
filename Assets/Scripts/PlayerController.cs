@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public Text countdownText;
     public AudioSource pickUpSound;
     public AudioSource winningSound;
-    public AudioSource loosingSound;
+    public AudioSource losingSound;
     public Material greenMaterial;
     public GameObject fadingWall;
 
@@ -54,8 +54,8 @@ public class PlayerController : MonoBehaviour
 
         if (countdownText.text.CompareTo("Countdown 0.0") == 0 & gameOver == false)
         {
-            finalText.text = "You Loose!";
-            loosingSound.Play();
+            finalText.text = "You Lose!";
+            losingSound.Play();
             gameOver = true;
         }
     }
