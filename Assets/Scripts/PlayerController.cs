@@ -7,9 +7,11 @@ public class PlayerController : MonoBehaviour
 
     public float speed;
     public Text countText;
-    public Text winText;
+    public Text finalText;
+    public Text countdownText;
     public AudioSource pickUpSound;
     public AudioSource winningSound;
+    public AudioSource loosingSound;
     public Material greenMaterial;
     public GameObject fadingWall;
 
@@ -20,17 +22,19 @@ public class PlayerController : MonoBehaviour
     private Color alpha;
     private float timeToFade = 2.0f;
     private int totalPickUps;
+    private bool gameOver;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         count = 0;
-        setCountText();
-        winText.text = "";
+        finalText.text = "";
         canFade = false;
         alpha = fadingWall.GetComponent<MeshRenderer>().material.color;
         alpha.a = 0;
         totalPickUps = 14;
+        setCountText();
+        gameOver = false;
     }
 
     void FixedUpdate()
@@ -47,35 +51,45 @@ public class PlayerController : MonoBehaviour
         {
             fadingWall.GetComponent<MeshRenderer>().material.color = Color.Lerp(fadingWall.GetComponent<MeshRenderer>().material.color, alpha, timeToFade * Time.deltaTime);
         }
+
+        if (countdownText.text.CompareTo("Countdown 0.0") == 0 & gameOver == false)
+        {
+            finalText.text = "You Loose!";
+            loosingSound.Play();
+            gameOver = true;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        // If it is an object that is tagged as "Pick Up"
-        if (other.gameObject.CompareTag("Pick Up"))
+        if (gameOver == false)
         {
-            // Make the object disappear (not be destroyed)
-            other.gameObject.SetActive(false);
-            count += 1;
-            if (count < totalPickUps) pickUpSound.Play();
-            else winningSound.Play();
-            setCountText();
-        }
+            // If it is an object that is tagged as "Pick Up"
+            if (other.gameObject.CompareTag("Pick Up"))
+            {
+                // Make the object disappear (not be destroyed)
+                other.gameObject.SetActive(false);
+                count += 1;
+                if (count < totalPickUps) pickUpSound.Play();
+                else winningSound.Play();
+                setCountText();
+            }
 
-        if (other.gameObject.CompareTag("Button"))
-        {
-            other.gameObject.GetComponent<MeshRenderer>().material = greenMaterial;
-            fadingWall.GetComponent<Collider>().enabled = false;
-            canFade = true;
+            if (other.gameObject.CompareTag("Button"))
+            {
+                other.gameObject.GetComponent<MeshRenderer>().material = greenMaterial;
+                fadingWall.GetComponent<Collider>().enabled = false;
+                canFade = true;
+            }
         }
     }
 
     void setCountText()
     {
-        countText.text = "Count: " + count.ToString();
+        countText.text = "Cubes left: " + (totalPickUps - count).ToString();
         if (count >= totalPickUps)
         {
-            winText.text = "You Win!";
+            finalText.text = "You Win!";
         }
     }
 }
